@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+# datasets, model weights, biometric indexes, customer data, logs
+data/datasets/
+data/uploads/
+data/thumbnails/
+data/processed/*.npz
+models/*.onnx
+indexes/
+logs/
+*.db
+*.index

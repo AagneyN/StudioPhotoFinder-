@@ -1,0 +1,6 @@
+{
+  "threshold": 0.3644,
+  "target_fmr": 0.001,
+  "calibrated_on": "gallery-vs-gallery impostor pairs",
+  "model": "SFace-2021dec:128:l2norm:cosine"
+}

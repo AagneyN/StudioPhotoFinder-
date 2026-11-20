@@ -1,0 +1,123 @@
+{
+  "generated_at": "2026-11-18T06:36:29+00:00",
+  "model": {
+    "name": "SFace-2021dec",
+    "embedding_dim": 128,
+    "execution_provider": "CPUExecutionProvider",
+    "requested_provider": "auto",
+    "fallback_reason": "CUDAExecutionProvider not available in this onnxruntime build (available: ['AzureExecutionProvider', 'CPUExecutionProvider']); using CPU.",
+    "fingerprint": "SFace-2021dec:128:l2norm:cosine"
+  },
+  "detector": "face_detection_yunet_2023mar.onnx",
+  "seed": 42,
+  "dataset": {
+    "name": "lfw",
+    "images": 13233,
+    "identities": 5749,
+    "subset_identities": null
+  },
+  "split": {
+    "gallery_photos": 8710,
+    "gallery_faces": 10341,
+    "gallery_photos_without_face": 0,
+    "known_queries": 2499,
+    "unknown_queries": 2024
+  },
+  "identification": {
+    "n_queries": 2499,
+    "n_detected": 2499,
+    "query_detection_rate": 1.0,
+    "top1_accuracy": 0.9715886354541817,
+    "top1_accuracy_detected_only": 0.9715886354541817,
+    "top5_accuracy": 0.9899959983993597,
+    "top5_accuracy_detected_only": 0.9899959983993597,
+    "top10_accuracy": 0.9903961584633854,
+    "top10_accuracy_detected_only": 0.9903961584633854,
+    "top1_accuracy_macro_per_identity": 0.9651289682539683,
+    "n_query_identities": 1680,
+    "search_latency_ms_mean": 2.321337615044371,
+    "search_latency_ms_p95": 2.842119999877468
+  },
+  "open_set": {
+    "n_unknown_queries": 2024,
+    "by_threshold": [
+      {
+        "threshold": 0.2975,
+        "false_match_rate": 0.9995059288537549,
+        "false_matches": 2023
+      },
+      {
+        "threshold": 0.3644,
+        "false_match_rate": 0.9352766798418972,
+        "false_matches": 1893
+      }
+    ]
+  },
+  "verification": {
+    "calibration_pairs": {
+      "genuine": 4078,
+      "impostor": 198820,
+      "source": "gallery vs gallery"
+    },
+    "test_pairs": {
+      "genuine": 7574,
+      "impostor": 90403,
+      "source": "query vs gallery"
+    },
+    "test_roc": {
+      "auc": 0.9940736220605068,
+      "eer": 0.013205294704773825,
+      "eer_threshold": 0.285030335187912
+    },
+    "operating_points": [
+      {
+        "target_fmr_on_calibration": 0.01,
+        "threshold": 0.2975,
+        "false_match_rate": 0.009269603884826831,
+        "false_non_match_rate": 0.013467124372854503
+      },
+      {
+        "target_fmr_on_calibration": 0.001,
+        "threshold": 0.3644,
+        "false_match_rate": 0.0011172195612977446,
+        "false_non_match_rate": 0.020992870345920255
+      }
+    ]
+  },
+  "calibrated_threshold": {
+    "threshold": 0.3644,
+    "target_fmr": 0.001,
+    "calibrated_on": "gallery-vs-gallery impostor pairs"
+  },
+  "timing": {
+    "detect_ms_per_image_mean": 2.7673662056983033,
+    "embed_ms_per_image_mean": 11.099175425074524,
+    "end_to_end_query_ms_mean": 23.467260499993472,
+    "end_to_end_query_ms_p95": 31.83346000005257,
+    "indexing_images_per_sec": 72.11603488650593,
+    "faces_total": 15704,
+    "this_run": {
+      "images_embedded_now": 0,
+      "wall_sec": 2.900000026784255e-06
+    },
+    "execution_provider": "CPUExecutionProvider",
+    "note": "per-image times come from the embedding cache (recorded when each image was first processed)"
+  },
+  "methodology": [
+    "Dataset: original LFW (13,233 images, 5,749 identities) read from the local copy; labels = folder names.",
+    "Split: deterministic (SHA-256 of seed+path). Identities with >=2 images: up to 5 images (~30%) become queries, the rest go to the gallery, so every query identity has >=1 gallery image and no query image is in the gallery. Identities with 1 image: half are gallery distractors, half are 'unknown' queries (person absent from the gallery).",
+    "Gallery: every acceptable face (YuNet, quality filter) of every gallery photo is embedded and indexed (exact cosine search).",
+    "Query: the best-quality face (largest, most frontal, highest confidence) of the query photo, as the UI does by default.",
+    "Identification: ranked list of distinct gallery photos; a result is correct only if its identity equals the query identity. Queries where no face is detected count as misses in topK_accuracy (end-to-end) and are excluded in *_detected_only.",
+    "Open-set false matches: unknown-person queries; FMR(t) = share whose best gallery score is >= t.",
+    "Verification: threshold calibrated on gallery-vs-gallery pairs only, then tested on disjoint query-vs-gallery pairs."
+  ],
+  "limitations": [
+    "LFW is mostly frontal, celebrity/news photos; studio passport photos differ (lighting, aging over years, glasses).",
+    "Many LFW identities have 2 images, so per-identity results rest on few samples; identity 'George W Bush' etc. are over-represented in micro averages.",
+    "Thresholds calibrated on LFW must be re-calibrated on studio data before any operational use.",
+    "Verification FMR floors: with N impostor pairs the smallest measurable FMR is ~1/N.",
+    "LFW may contain a small number of mislabeled/duplicate images; they are not corrected here.",
+    "Similarity ranking is a decision-support tool, not proof of identity."
+  ]
+}
